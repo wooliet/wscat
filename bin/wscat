@@ -126,6 +126,7 @@ program
   .option('-p, --protocol <version>', 'optional protocol version')
   .option('-o, --origin <origin>', 'optional origin')
   .option('--host <host>', 'optional host')
+  .option('-k, --keep-alive <seconds>', 'send ping every n seconds')
   .option('-s, --subprotocol <protocol>', 'optional subprotocol')
   .option('-n, --no-check', 'Do not check for unauthorized certificates')
   .option('-H, --header <header:value>', 'Set an HTTP header. Repeat to set multiple. (--connect only)', appender(), [])
@@ -211,6 +212,8 @@ if (program.listen && program.connect) {
       connectUrl = 'ws://' + connectUrl;
     }
 
+    var keepAliveSecs = parseInt(program.keepAlive);
+
     options.headers = headers;
     var ws = new WebSocket(connectUrl, options);
 
@@ -220,6 +223,11 @@ if (program.listen && program.connect) {
         ws.send(data);
         wsConsole.prompt();
       });
+      if(!isNaN(keepAliveSecs) && keepAliveSecs > 0) {
+        keepAliveTimer = setInterval(function(){
+          ws.ping();
+        }, keepAliveSecs * 1000);
+      }
     }).on('close', function close() {
       wsConsole.print(Console.Types.Control, 'disconnected', Console.Colors.Green);
       wsConsole.clear();
