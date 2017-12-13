@@ -234,7 +234,7 @@ if (program.listen && program.connect) {
           wsConsole.prompt();
         });
         if(!isNaN(keepAliveSecs) && keepAliveSecs > 0) {
-          keepAliveTimer = setInterval(function(){
+          setInterval(function(){
             ws.ping();
           }, keepAliveSecs * 1000);
         }
